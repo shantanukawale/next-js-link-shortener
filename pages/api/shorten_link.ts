@@ -4,10 +4,11 @@ export default async (req, res) => {
   const db = await connectToDatabase();
 
   if (req.body !== '' && req.body.link !== undefined && req.body.link !== '') {
-    const entry = await db.db('links_db').collection('links_collection').insertOne({ link: req.body.link });
+    const entry = await db.db('links_db').collection('links_collection').findOne({ link: req.body.link }) ||
+    await db.db('links_db').collection('links_collection').insertOne({ link: req.body.link });
 
     res.statusCode = 201;
-    return res.json({ short_link: `${process.env.VERCEL_URL}/r/${entry.insertedId}` });
+    return res.json({ short_link: `${process.env.VERCEL_URL}/r/${entry.insertedId || entry._id}` });
   }
 
   res.statusCode = 409;
